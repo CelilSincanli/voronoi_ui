@@ -1,0 +1,10 @@
+cmake
+libglfw3-dev
+libgl1-mesa-dev
+libglu1-mesa-dev
+zlib1g-dev
+libx11-dev
+libxrandr-dev
+libxi-dev
+libxxf86vm-dev
+libxcursor-dev

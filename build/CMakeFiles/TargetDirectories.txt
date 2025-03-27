@@ -1,0 +1,3 @@
+/home/celil/workspace/imgui/voronoi_ui/build/CMakeFiles/voronoi_ui.dir
+/home/celil/workspace/imgui/voronoi_ui/build/CMakeFiles/edit_cache.dir
+/home/celil/workspace/imgui/voronoi_ui/build/CMakeFiles/rebuild_cache.dir
