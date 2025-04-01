@@ -4,6 +4,9 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+// Icon implementation
+#include "dripicon_v2.h"
+
 // Callback for GLFW errors
 void glfw_error_callback(int error, const char* description) {
     std::cerr << "GLFW Error " << error << ": " << description << std::endl;
@@ -23,7 +26,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Create a GLFW window
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui - Hello World", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui - Voronoi Diagram Playground", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -44,6 +47,18 @@ int main() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
+    ImFont* mainfont = io.Fonts->AddFontFromFileTTF(
+        ASSET_PATH "/nasalization/nasalization rg.ttf", 18.5f, NULL, io.Fonts->GetGlyphRangesDefault());
+    
+    ImFont* mainfont_heading = io.Fonts->AddFontFromFileTTF(
+        ASSET_PATH "/nasalization/nasalization rg.ttf", 30.0f, NULL, io.Fonts->GetGlyphRangesDefault());
+
+    ImFontConfig font2_config;
+    font2_config.PixelSnapH = true; // Sharper font
+    font2_config.FontDataOwnedByAtlas = false; // To able to manage meemry by myself
+    static const ImWchar icon_ranges[] = { 0xe000, 0xf8ff, 0 };  // Dripicons range
+    ImFont* iconfont = io.Fonts->AddFontFromMemoryCompressedTTF(dripiconfont_compressed_data, dripiconfont_compressed_size, 28.0f, &font2_config, icon_ranges);
+
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         // Poll and handle events
@@ -54,9 +69,70 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // Create a simple "Hello, World!" window
-        ImGui::Begin("Hello, World!");
-        ImGui::Text("This is a simple Dear ImGui example.");
+        // Fullscreen ImGui window
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowSize(io.DisplaySize);
+        ImGui::Begin("Voronoi Diagram Playground", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+
+        // Center the text and buttons
+        ImVec2 window_size = ImGui::GetContentRegionAvail();
+        ImGui::PushFont(mainfont_heading);
+        ImVec2 text_size = ImGui::CalcTextSize("Voronoi Diagram Playground");
+        ImGui::PopFont();
+        ImGui::PushFont(iconfont);
+        ImVec2 icon_size = ImGui::CalcTextSize(u8"\uE016");
+        ImGui::PopFont();
+
+        float total_text_width = text_size.x + icon_size.x + 5.0f; // Add some padding between text and icon
+
+        float button_width = 200.0f; // Fixed button width
+        float button_height = 40.0f; // Fixed button height
+        float spacing = 20.0f; // Spacing between elements
+
+        // Calculate total height of content (text + spacing + buttons)
+        float total_height = text_size.y + spacing + button_height + spacing + button_height;
+
+        // Calculate starting Y position to center content vertically
+        float start_y = (window_size.y - total_height) * 0.5f;
+
+        // Calculate the X position to center the text and icon
+        float text_x = (window_size.x - total_text_width) * 0.5f;
+
+        ImGui::SetCursorPos(ImVec2(text_x, start_y));
+        ImGui::PushFont(mainfont_heading);
+        ImGui::Text("Voronoi Diagram Playground"); // Pamphlet icon
+        ImGui::PopFont();
+        ImGui::SameLine();
+        ImGui::PushFont(iconfont);
+        ImGui::Text("%s", u8"\uE016"); // Unicode for Dripicons icon            ImGui::PopFont();
+        ImGui::PopFont();
+        // Add spacing
+        start_y += text_size.y + spacing;
+
+        // Center "Start a New Diagram" button horizontally and position vertically
+        float button_x = (window_size.x - button_width) * 0.5f;
+        ImGui::SetCursorPos(ImVec2(button_x, start_y));
+        ImGui::PushFont(iconfont);
+        ImGui::Text("%s", u8"\uE03F"); // Unicode for Dripicons icon            ImGui::PopFont();
+        ImGui::PopFont();
+        ImGui::SameLine();
+        if (ImGui::Button("Create Diagram", ImVec2(button_width, button_height))) { // Rocket icon
+            std::cout << "Create Diagram button clicked!" << std::endl;
+        }
+
+        // Add spacing
+        start_y += button_height + spacing;
+
+        // Center "Load a New Diagram" button horizontally and position vertically
+        ImGui::SetCursorPos(ImVec2(button_x, start_y));
+                ImGui::PushFont(iconfont);
+        ImGui::Text("%s", u8"\uE055"); // Unicode for Dripicons icon            ImGui::PopFont();
+        ImGui::PopFont();
+        ImGui::SameLine();
+        if (ImGui::Button("Load Diagram", ImVec2(button_width, button_height))) { // Upload icon
+            std::cout << "Load Diagram button clicked!" << std::endl;
+        }
+
         ImGui::End();
 
         // Render
