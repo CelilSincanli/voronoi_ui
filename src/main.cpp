@@ -7,9 +7,29 @@
 // Icon implementation
 #include "dripicon_v2.h"
 
+//Loading image files
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 // Callback for GLFW errors
 void glfw_error_callback(int error, const char* description) {
     std::cerr << "GLFW Error " << error << ": " << description << std::endl;
+}
+
+// Function to set the application icon
+void SetWindowIcon(GLFWwindow* window, const char* icon_path) {
+    int width, height, channels;
+    unsigned char* pixels = stbi_load(icon_path, &width, &height, &channels, 4); // Load image as RGBA
+    if (pixels) {
+        GLFWimage image;
+        image.width = width;
+        image.height = height;
+        image.pixels = pixels;
+        glfwSetWindowIcon(window, 1, &image); // Set the icon
+        stbi_image_free(pixels); // Free the image memory
+    } else {
+        std::cerr << "Failed to load icon: " << icon_path << std::endl;
+    }
 }
 
 int main() {
@@ -26,12 +46,17 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Create a GLFW window
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui - Voronoi Diagram Playground", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "Voronoi Diagram Playground", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
+
+    // Set the application icon
+    SetWindowIcon(window, "include/assets/icons/voronoi_transparent.png");
+
+
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
