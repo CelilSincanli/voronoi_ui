@@ -19,11 +19,12 @@ add_executable(voronoi_ui
 )
 
 target_include_directories(voronoi_ui PRIVATE 
-    include/third_parties/imgui 
-    include/third_parties/imgui/backends
-    include/assets/fonts
-    include/assets/icons
-    include/assets/images
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/third_parties/imgui 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/third_parties/imgui/backends
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/assets/fonts
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/assets/images
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/assets/icons
     ${CMAKE_CURRENT_SOURCE_DIR}/include/third_parties/stb
 )
 
