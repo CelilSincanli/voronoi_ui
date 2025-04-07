@@ -10,6 +10,7 @@ add_definitions(-DASSET_PATH="${CMAKE_SOURCE_DIR}/include/assets/fonts")
 
 add_executable(voronoi_ui 
     src/main.cpp
+    src/voronoi_ui.cpp
     include/third_parties/imgui/imgui.cpp
     include/third_parties/imgui/imgui_draw.cpp
     include/third_parties/imgui/imgui_tables.cpp
