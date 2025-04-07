@@ -10,7 +10,7 @@ void glfw_error_callback(int error, const char* description) {
     std::cerr << "GLFW Error " << error << ": " << description << std::endl;
 }
 
-VoronoiUI::VoronoiUI() : window(nullptr), mainFont(nullptr), headingFont(nullptr), iconFont(nullptr) {}
+VoronoiUI::VoronoiUI() : window(nullptr), mainFont(nullptr), headingFont(nullptr), iconFont(nullptr), currentScreen(MAIN_SCREEN)  {}
 
 VoronoiUI::~VoronoiUI() {
     Cleanup();
@@ -66,6 +66,11 @@ bool VoronoiUI::Initialize() {
     fontConfig.FontDataOwnedByAtlas = false;
     static const ImWchar iconRanges[] = { 0xe000, 0xf8ff, 0 }; // Dripicons range
     iconFont = io.Fonts->AddFontFromMemoryCompressedTTF(dripiconfont_compressed_data, dripiconfont_compressed_size, 28.0f, &fontConfig, iconRanges);
+    static const ImWchar iconRanges2[] = { 0x20, 0x7F, 0 }; // Dripicons range
+    ImFontConfig icons_config;
+    icons_config.MergeMode = false;
+    icons_config.PixelSnapH = true;
+    iconFont2 = io.Fonts->AddFontFromMemoryCompressedTTF(dripiconfont_compressed_data, dripiconfont_compressed_size, 28.0f, &icons_config, iconRanges2);
 
     return true;
 }
@@ -117,6 +122,18 @@ void VoronoiUI::RenderUI() {
     ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
     ImGui::Begin("Voronoi Diagram Playground", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
+    if (currentScreen == MAIN_SCREEN) {
+        // Render the main screen
+        RenderMainScreen();
+    } else if (currentScreen == NEW_DIAGRAM_SCREEN) {
+        // Render the new diagram screen
+        RenderNewDiagramScreen();
+    }
+
+    ImGui::End();
+}
+
+void VoronoiUI::RenderMainScreen() {
     // Center the text and buttons
     ImVec2 window_size = ImGui::GetContentRegionAvail();
     ImGui::PushFont(headingFont);
@@ -147,27 +164,39 @@ void VoronoiUI::RenderUI() {
     start_y += text_size.y + spacing;
 
     float button_x = (window_size.x - button_width) * 0.5f;
+    
     ImGui::SetCursorPos(ImVec2(button_x, start_y));
     ImGui::PushFont(iconFont);
-    ImGui::Text("%s", u8"\uE03F"); // Unicode for Dripicons icon            ImGui::PopFont();
+    ImGui::Text("%s", u8"\uE03F");
     ImGui::PopFont();
     ImGui::SameLine();
+    
     if (ImGui::Button("Create Diagram", ImVec2(button_width, button_height))) {
         std::cout << "Create Diagram button clicked!" << std::endl;
+        currentScreen = NEW_DIAGRAM_SCREEN; // Switch to the new diagram screen
     }
 
     start_y += button_height + spacing;
 
     ImGui::SetCursorPos(ImVec2(button_x, start_y));
     ImGui::PushFont(iconFont);
-    ImGui::Text("%s", u8"\uE055"); // Unicode for Dripicons icon            ImGui::PopFont();
+    ImGui::Text("%s", u8"\uE055"); 
     ImGui::PopFont();
     ImGui::SameLine();
+
     if (ImGui::Button("Load Diagram", ImVec2(button_width, button_height))) {
         std::cout << "Load Diagram button clicked!" << std::endl;
     }
+}
 
-    ImGui::End();
+void VoronoiUI::RenderNewDiagramScreen() {
+    ImGui::Spacing();
+
+    ImGui::PushFont(iconFont2);
+    if (ImGui::Button("U", ImVec2(50.0f, 35.0f))) {
+        currentScreen = MAIN_SCREEN;
+    }
+    ImGui::PopFont();
 }
 
 void VoronoiUI::Cleanup() {

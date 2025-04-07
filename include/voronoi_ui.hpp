@@ -25,6 +25,12 @@ private:
     ImFont* mainFont;
     ImFont* headingFont;
     ImFont* iconFont;
+    ImFont* iconFont2;
+    
+    void RenderMainScreen();
+    void RenderNewDiagramScreen();
+    enum Screen { MAIN_SCREEN, NEW_DIAGRAM_SCREEN };
+    Screen currentScreen;
 
     void SetWindowIcon(const std::string& iconPath);
     void RenderUI();
