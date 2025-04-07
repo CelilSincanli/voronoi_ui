@@ -66,6 +66,7 @@ bool VoronoiUI::Initialize() {
     fontConfig.FontDataOwnedByAtlas = false;
     static const ImWchar iconRanges[] = { 0xe000, 0xf8ff, 0 }; // Dripicons range
     iconFont = io.Fonts->AddFontFromMemoryCompressedTTF(dripiconfont_compressed_data, dripiconfont_compressed_size, 28.0f, &fontConfig, iconRanges);
+    
     static const ImWchar iconRanges2[] = { 0x20, 0x7F, 0 }; // Dripicons range
     ImFontConfig icons_config;
     icons_config.MergeMode = false;
@@ -192,11 +193,47 @@ void VoronoiUI::RenderMainScreen() {
 void VoronoiUI::RenderNewDiagramScreen() {
     ImGui::Spacing();
 
-    ImGui::PushFont(iconFont2);
-    if (ImGui::Button("U", ImVec2(50.0f, 35.0f))) {
-        currentScreen = MAIN_SCREEN;
+    // Get the size of the application screen
+    ImGuiIO& io = ImGui::GetIO();
+    float screenWidth = io.DisplaySize.x;
+    float screenHeight = io.DisplaySize.y;
+
+    // Calculate frame sizes dynamically based on screen size
+    float frameWidth1 = screenWidth * 0.99f;  // 99% of screen width
+    float frameHeight1 = screenHeight * 0.06f; // 6% of screen height
+
+    float frameWidth2 = screenWidth * 0.8f;  // 70% of screen width
+    float frameHeight2 = screenHeight * 0.88f; // 80% of screen height
+
+    float frameWidth3 = screenWidth * 0.178f; // 25% of screen width
+    float frameHeight3 = screenHeight * 0.88f; // 80% of screen height
+
+    // Add a bordered frame at the top
+    ImGui::BeginChild("FrameArea", ImVec2(frameWidth1, frameHeight1), true, ImGuiWindowFlags_NoScrollbar);
+    {
+        ImGui::PushFont(iconFont2);
+        if (ImGui::Button("U", ImVec2(50.0f, 35.0f))) {
+            currentScreen = MAIN_SCREEN;
+        }
+        ImGui::PopFont();
     }
-    ImGui::PopFont();
+    ImGui::EndChild();
+
+    // Add another bordered frame for the main content
+    ImGui::SetCursorPos(ImVec2(screenWidth * 0.005f, frameHeight1 + 20.0)); // Centered horizontally, below the first frame
+    ImGui::BeginChild("AnotherFrame", ImVec2(frameWidth2, frameHeight2), true, ImGuiWindowFlags_NoScrollbar);
+    {
+        ImGui::Text("This is the main content area.");
+    }
+    ImGui::EndChild();
+
+    // Add a third bordered frame on the right side
+    ImGui::SetCursorPos(ImVec2(screenWidth * 0.005f + frameWidth2 + 20.0, frameHeight1 + 20.0f)); // Positioned on the right, below the first frame
+    ImGui::BeginChild("RightFrame", ImVec2(frameWidth3, frameHeight3), true, ImGuiWindowFlags_NoScrollbar);
+    {
+        ImGui::Text("This is the right frame.");
+    }
+    ImGui::EndChild();
 }
 
 void VoronoiUI::Cleanup() {
