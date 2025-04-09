@@ -17,12 +17,15 @@ add_executable(voronoi_ui
     include/third_parties/imgui/imgui_widgets.cpp
     include/third_parties/imgui/backends/imgui_impl_glfw.cpp
     include/third_parties/imgui/backends/imgui_impl_opengl3.cpp
+    include/third_parties/implot/implot.cpp
+    include/third_parties/implot/implot_items.cpp
 )
 
 target_include_directories(voronoi_ui PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/third_parties/imgui 
     ${CMAKE_CURRENT_SOURCE_DIR}/include/third_parties/imgui/backends
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/third_parties/implot
     ${CMAKE_CURRENT_SOURCE_DIR}/include/assets/fonts
     ${CMAKE_CURRENT_SOURCE_DIR}/include/assets/images
     ${CMAKE_CURRENT_SOURCE_DIR}/include/assets/icons

@@ -51,7 +51,7 @@ bool VoronoiUI::Initialize() {
     // Set Dear ImGui style
     ImGui::StyleColorsDark();
 
-    // Initialize platform/renderer bindings
+    ImPlot::CreateContext(); 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
     // Load fonts
@@ -64,10 +64,10 @@ bool VoronoiUI::Initialize() {
     ImFontConfig fontConfig;
     fontConfig.PixelSnapH = true;
     fontConfig.FontDataOwnedByAtlas = false;
-    static const ImWchar iconRanges[] = { 0xe000, 0xf8ff, 0 }; // Dripicons range
+    static const ImWchar iconRanges[] = { 0xe000, 0xf8ff, 0 };
     iconFont = io.Fonts->AddFontFromMemoryCompressedTTF(dripiconfont_compressed_data, dripiconfont_compressed_size, 28.0f, &fontConfig, iconRanges);
     
-    static const ImWchar iconRanges2[] = { 0x20, 0x7F, 0 }; // Dripicons range
+    static const ImWchar iconRanges2[] = { 0x20, 0x7F, 0 };
     ImFontConfig icons_config;
     icons_config.MergeMode = false;
     icons_config.PixelSnapH = true;
@@ -78,14 +78,14 @@ bool VoronoiUI::Initialize() {
 
 void VoronoiUI::SetWindowIcon(const std::string& iconPath) {
     int width, height, channels;
-    unsigned char* pixels = stbi_load(iconPath.c_str(), &width, &height, &channels, 4); // Load image as RGBA
+    unsigned char* pixels = stbi_load(iconPath.c_str(), &width, &height, &channels, 4);
     if (pixels) {
         GLFWimage image;
         image.width = width;
         image.height = height;
         image.pixels = pixels;
-        glfwSetWindowIcon(window, 1, &image); // Set the icon
-        stbi_image_free(pixels); // Free the image memory
+        glfwSetWindowIcon(window, 1, &image);
+        stbi_image_free(pixels);
     } else {
         std::cerr << "Failed to load icon: " << iconPath << std::endl;
     }
@@ -93,18 +93,14 @@ void VoronoiUI::SetWindowIcon(const std::string& iconPath) {
 
 void VoronoiUI::Run() {
     while (!glfwWindowShouldClose(window)) {
-        // Poll and handle events
         glfwPollEvents();
 
-        // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // Render the UI
         RenderUI();
 
-        // Render
         ImGui::Render();
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
@@ -118,16 +114,13 @@ void VoronoiUI::Run() {
 }
 
 void VoronoiUI::RenderUI() {
-    // Fullscreen ImGui window
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
     ImGui::Begin("Voronoi Diagram Playground", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
     if (currentScreen == MAIN_SCREEN) {
-        // Render the main screen
         RenderMainScreen();
     } else if (currentScreen == NEW_DIAGRAM_SCREEN) {
-        // Render the new diagram screen
         RenderNewDiagramScreen();
     }
 
@@ -135,7 +128,7 @@ void VoronoiUI::RenderUI() {
 }
 
 void VoronoiUI::RenderMainScreen() {
-    // Center the text and buttons
+
     ImVec2 window_size = ImGui::GetContentRegionAvail();
     ImGui::PushFont(headingFont);
     ImVec2 text_size = ImGui::CalcTextSize("Voronoi Diagram Playground");
@@ -144,7 +137,7 @@ void VoronoiUI::RenderMainScreen() {
     ImVec2 icon_size = ImGui::CalcTextSize(u8"\uE016");
     ImGui::PopFont();
 
-    float total_text_width = text_size.x + icon_size.x + 5.0f; // Add some padding between text and icon
+    float total_text_width = text_size.x + icon_size.x + 5.0f;
     float button_width = 200.0f;
     float button_height = 40.0f;
     float spacing = 20.0f;
@@ -174,7 +167,7 @@ void VoronoiUI::RenderMainScreen() {
     
     if (ImGui::Button("Create Diagram", ImVec2(button_width, button_height))) {
         std::cout << "Create Diagram button clicked!" << std::endl;
-        currentScreen = NEW_DIAGRAM_SCREEN; // Switch to the new diagram screen
+        currentScreen = NEW_DIAGRAM_SCREEN;
     }
 
     start_y += button_height + spacing;
@@ -193,22 +186,19 @@ void VoronoiUI::RenderMainScreen() {
 void VoronoiUI::RenderNewDiagramScreen() {
     ImGui::Spacing();
 
-    // Get the size of the application screen
     ImGuiIO& io = ImGui::GetIO();
     float screenWidth = io.DisplaySize.x;
     float screenHeight = io.DisplaySize.y;
 
-    // Calculate frame sizes dynamically based on screen size
-    float frameWidth1 = screenWidth * 0.99f;  // 99% of screen width
-    float frameHeight1 = screenHeight * 0.06f; // 6% of screen height
+    float frameWidth1 = screenWidth * 0.99f;
+    float frameHeight1 = screenHeight * 0.06f;
 
-    float frameWidth2 = screenWidth * 0.8f;  // 70% of screen width
-    float frameHeight2 = screenHeight * 0.88f; // 80% of screen height
+    float frameWidth2 = screenWidth * 0.72f;
+    float frameHeight2 = screenHeight * 0.88f;
 
-    float frameWidth3 = screenWidth * 0.178f; // 25% of screen width
-    float frameHeight3 = screenHeight * 0.88f; // 80% of screen height
+    float frameWidth3 = screenWidth * 0.25f;
+    float frameHeight3 = screenHeight * 0.88f;
 
-    // Add a bordered frame at the top
     ImGui::BeginChild("FrameArea", ImVec2(frameWidth1, frameHeight1), true, ImGuiWindowFlags_NoScrollbar);
     {
         ImGui::PushFont(iconFont2);
@@ -219,16 +209,34 @@ void VoronoiUI::RenderNewDiagramScreen() {
     }
     ImGui::EndChild();
 
-    // Add another bordered frame for the main content
-    ImGui::SetCursorPos(ImVec2(screenWidth * 0.005f, frameHeight1 + 20.0)); // Centered horizontally, below the first frame
-    ImGui::BeginChild("AnotherFrame", ImVec2(frameWidth2, frameHeight2), true, ImGuiWindowFlags_NoScrollbar);
+    ImGui::SetCursorPos(ImVec2((screenWidth - frameWidth2) * 0.015f, frameHeight1 + 20.0f)); // Centered horizontally, below the first frame
+    ImGui::BeginChild("CoordinateFrame", ImVec2(frameWidth2, frameHeight2), true, ImGuiWindowFlags_NoScrollbar);
     {
-        ImGui::Text("This is the main content area.");
+        static float x_data[1000];
+        static float y_data[1000];
+        static bool initialized = false;
+
+        if (!initialized) {
+            for (int i = 0; i < 1000; ++i) {
+                x_data[i] = i * 0.01f;
+                y_data[i] = sinf(x_data[i]);
+            }
+            initialized = true;
+        }
+
+        ImVec2 availableSize = ImGui::GetContentRegionAvail();
+
+        if (ImPlot::BeginPlot("Cartesian Graph", availableSize)) {
+            ImPlot::SetupAxes("X-Axis", "Y-Axis");
+            ImPlot::SetupAxisLimits(ImAxis_X1, 0, 10);
+            ImPlot::SetupAxisLimits(ImAxis_Y1, -1, 1);
+            ImPlot::PlotLine("Sine Wave", x_data, y_data, 1000);
+            ImPlot::EndPlot();
+        }
     }
     ImGui::EndChild();
 
-    // Add a third bordered frame on the right side
-    ImGui::SetCursorPos(ImVec2(screenWidth * 0.005f + frameWidth2 + 20.0, frameHeight1 + 20.0f)); // Positioned on the right, below the first frame
+    ImGui::SetCursorPos(ImVec2(screenWidth - frameWidth3 - 10.0f, frameHeight1 + 20.0f)); // Positioned on the right, below the first frame
     ImGui::BeginChild("RightFrame", ImVec2(frameWidth3, frameHeight3), true, ImGuiWindowFlags_NoScrollbar);
     {
         ImGui::Text("This is the right frame.");
@@ -244,4 +252,5 @@ void VoronoiUI::Cleanup() {
         glfwDestroyWindow(window);
         glfwTerminate();
     }
+    ImPlot::DestroyContext();
 }
