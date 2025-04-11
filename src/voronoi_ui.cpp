@@ -261,6 +261,16 @@ void VoronoiUI::RenderNewDiagramScreen() {
         ImGui::SetCursorPos(ImVec2(buttonX, buttonY));
         if (ImGui::Button(saveButtonText, ImVec2(buttonWidth, buttonHeight))) {
         }
+
+        const char* alignCenterText = "Align Center";
+        textSize = ImGui::CalcTextSize(alignCenterText);
+
+        buttonX = (frameWidth3 - buttonWidth) * 0.5f;
+        buttonY = frameHeight3 - buttonHeight - 20.0f;
+        ImGui::SetCursorPos(ImVec2(buttonX, buttonY));
+        if (ImGui::Button(alignCenterText, ImVec2(buttonWidth, buttonHeight))) {
+
+        }
     }
     ImGui::EndChild();
 }
