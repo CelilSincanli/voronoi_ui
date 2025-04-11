@@ -9,6 +9,9 @@
 #include <iostream>
 #include <string>
 #include <array>
+#include <chrono>
+#include <vector>
+#include <algorithm>
 
 // Icon implementation
 #include "dripicon_v2.h"
@@ -35,11 +38,22 @@ private:
         int point_count = 0;            // Number of points
     };
 
+    struct Notification {
+        std::string title;
+        std::string text;
+        std::chrono::steady_clock::time_point start_time;
+        float duration;
+    };
+    
     PlotData plotData;
     
+    std::vector<Notification> notifications;
+
     void RenderMainScreen();
     void RenderNewDiagramScreen();
     void CustomizeImPlotInputMap();
+    void ShowNotifications(const std::string& title, const std::string& text, float duration_ms);
+    void RenderNotification();
     enum Screen { MAIN_SCREEN, NEW_DIAGRAM_SCREEN };
     Screen currentScreen;
 

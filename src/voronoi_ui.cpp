@@ -258,6 +258,8 @@ void VoronoiUI::RenderNewDiagramScreen() {
     ImGui::SetCursorPos(ImVec2(screenWidth - frameWidth3 - 10.0f, frameHeight1 + 20.0f)); // Positioned on the right, below the first frame
     ImGui::BeginChild("RightFrame", ImVec2(frameWidth3, frameHeight3), false, ImGuiWindowFlags_NoScrollbar);
     {
+        RenderNotification();
+        
         const char* drawButtonText = "Draw";
         ImVec2 textSize = ImGui::CalcTextSize(drawButtonText);
 
@@ -268,13 +270,18 @@ void VoronoiUI::RenderNewDiagramScreen() {
         float buttonY = 20.0f;
         ImGui::SetCursorPos(ImVec2(buttonX, buttonY));
         if (ImGui::Button(drawButtonText, ImVec2(buttonWidth, buttonHeight))) {
-
+            if (plotData.point_count < 1) {
+                ShowNotifications("Error", "Please add at least one point to the diagram.", 3000);
+            }
         }
 
         const char* saveButtonText = "Save Diagram";
         buttonY += buttonHeight + 10.0f;
         ImGui::SetCursorPos(ImVec2(buttonX, buttonY));
         if (ImGui::Button(saveButtonText, ImVec2(buttonWidth, buttonHeight))) {
+            if (plotData.point_count < 1) {
+                ShowNotifications("Error", "Please add at least one point to the diagram.", 3000);
+            }
         }
 
         const char* alignCenterText = "Align Center";
@@ -284,6 +291,9 @@ void VoronoiUI::RenderNewDiagramScreen() {
         buttonY = frameHeight3 - buttonHeight - 20.0f;
         ImGui::SetCursorPos(ImVec2(buttonX, buttonY));
         if (ImGui::Button(alignCenterText, ImVec2(buttonWidth, buttonHeight))) {
+            if (plotData.point_count < 1) {
+                ShowNotifications("Error", "Please add at least one point to the diagram.", 3000);
+            }
 
         }
     }
@@ -299,6 +309,38 @@ void VoronoiUI::CustomizeImPlotInputMap() {
     inputMap.Select = ImGuiMouseButton_Right;
     inputMap.SelectMod = 0;
 
+}
+
+void VoronoiUI::ShowNotifications(const std::string& title, const std::string& text, float duration_ms) {
+    Notification notification;
+    notification.title = title;
+    notification.text = text;
+    notification.duration = duration_ms / 1000.0f;
+    notification.start_time = std::chrono::steady_clock::now();
+    notifications.push_back(notification);
+}
+
+void VoronoiUI::RenderNotification() {
+    ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 250, ImGui::GetIO().DisplaySize.y - 100), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(240, 80), ImGuiCond_Always);
+
+    for (int i = 0; i < notifications.size();)
+    {
+        Notification& notification = notifications[i];
+        float elapsed_time = std::chrono::duration<float>(std::chrono::steady_clock::now() - notification.start_time).count();
+
+        if(elapsed_time > notification.duration) {
+            notifications.erase(notifications.begin() + i);
+        }else{
+            ImGui::Begin("Notification", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+            ImGui::Text("%s", notification.title.c_str());
+            ImGui::Separator();
+            ImGui::TextWrapped("%s", notification.text.c_str());
+            ImGui::End();
+            i++;
+        }
+    }
+    
 }
 
 void VoronoiUI::Cleanup() {
