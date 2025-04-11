@@ -166,7 +166,6 @@ void VoronoiUI::RenderMainScreen() {
     ImGui::SameLine();
     
     if (ImGui::Button("Create Diagram", ImVec2(button_width, button_height))) {
-        std::cout << "Create Diagram button clicked!" << std::endl;
         currentScreen = NEW_DIAGRAM_SCREEN;
     }
 
@@ -199,7 +198,7 @@ void VoronoiUI::RenderNewDiagramScreen() {
     float frameWidth3 = screenWidth * 0.25f;
     float frameHeight3 = screenHeight * 0.88f;
 
-    ImGui::BeginChild("FrameArea", ImVec2(frameWidth1, frameHeight1), true, ImGuiWindowFlags_NoScrollbar);
+    ImGui::BeginChild("FrameArea", ImVec2(frameWidth1, frameHeight1), false, ImGuiWindowFlags_NoScrollbar);
     {
         ImGui::PushFont(iconFont2);
         if (ImGui::Button("U", ImVec2(50.0f, 35.0f))) {
@@ -210,36 +209,58 @@ void VoronoiUI::RenderNewDiagramScreen() {
     ImGui::EndChild();
 
     ImGui::SetCursorPos(ImVec2((screenWidth - frameWidth2) * 0.015f, frameHeight1 + 20.0f)); // Centered horizontally, below the first frame
-    ImGui::BeginChild("CoordinateFrame", ImVec2(frameWidth2, frameHeight2), true, ImGuiWindowFlags_NoScrollbar);
+    ImGui::BeginChild("CoordinateFrame", ImVec2(frameWidth2, frameHeight2), false, ImGuiWindowFlags_NoScrollbar);
     {
         static float x_data[1000];
         static float y_data[1000];
-        static bool initialized = false;
-
-        if (!initialized) {
-            for (int i = 0; i < 1000; ++i) {
-                x_data[i] = i * 0.01f;
-                y_data[i] = sinf(x_data[i]);
-            }
-            initialized = true;
-        }
+        static int point_count = 0;
 
         ImVec2 availableSize = ImGui::GetContentRegionAvail();
 
-        if (ImPlot::BeginPlot("Cartesian Graph", availableSize)) {
+        if (ImPlot::BeginPlot("Voronoi Space", availableSize)) {
             ImPlot::SetupAxes("X-Axis", "Y-Axis");
             ImPlot::SetupAxisLimits(ImAxis_X1, 0, 10);
-            ImPlot::SetupAxisLimits(ImAxis_Y1, -1, 1);
-            ImPlot::PlotLine("Sine Wave", x_data, y_data, 1000);
+            ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 5);
+
+            if (ImPlot::IsPlotHovered() && ImGui::IsMouseClicked(0)) {
+                ImPlotPoint mousePos = ImPlot::GetPlotMousePos();
+                if (point_count < 1000) {
+                    x_data[point_count] = mousePos.x;
+                    y_data[point_count] = mousePos.y;
+                    point_count++;
+                }
+            }
+
+            if (point_count > 0) {
+                ImPlot::PlotScatter("Points", x_data, y_data, point_count);
+            }
+
             ImPlot::EndPlot();
         }
     }
     ImGui::EndChild();
 
     ImGui::SetCursorPos(ImVec2(screenWidth - frameWidth3 - 10.0f, frameHeight1 + 20.0f)); // Positioned on the right, below the first frame
-    ImGui::BeginChild("RightFrame", ImVec2(frameWidth3, frameHeight3), true, ImGuiWindowFlags_NoScrollbar);
+    ImGui::BeginChild("RightFrame", ImVec2(frameWidth3, frameHeight3), false, ImGuiWindowFlags_NoScrollbar);
     {
-        ImGui::Text("This is the right frame.");
+        const char* drawButtonText = "Draw";
+        ImVec2 textSize = ImGui::CalcTextSize(drawButtonText);
+
+        float buttonWidth = textSize.x * 4.0f;
+        float buttonHeight = textSize.y * 2.0f;
+
+        float buttonX = (frameWidth3 - buttonWidth) * 0.5f;
+        float buttonY = 20.0f;
+        ImGui::SetCursorPos(ImVec2(buttonX, buttonY));
+        if (ImGui::Button(drawButtonText, ImVec2(buttonWidth, buttonHeight))) {
+
+        }
+
+        const char* saveButtonText = "Save Diagram";
+        buttonY += buttonHeight + 10.0f;
+        ImGui::SetCursorPos(ImVec2(buttonX, buttonY));
+        if (ImGui::Button(saveButtonText, ImVec2(buttonWidth, buttonHeight))) {
+        }
     }
     ImGui::EndChild();
 }
