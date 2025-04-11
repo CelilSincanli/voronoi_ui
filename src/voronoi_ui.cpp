@@ -232,6 +232,14 @@ void VoronoiUI::RenderNewDiagramScreen() {
                 }
             }
 
+            if (ImPlot::IsPlotHovered() && ImGui::IsMouseClicked(1)) { // Right mouse button
+                if (plotData.point_count > 1) {
+                    plotData.point_count--; // Decrement the point count to remove the last point
+                    plotData.x_data[plotData.point_count] = 0.0f; // Clear the last X point
+                    plotData.y_data[plotData.point_count] = 0.0f; // Clear the last Y point
+                }
+            }
+
             if (plotData.point_count > 0) {
                 ImPlot::PlotScatter("Points", plotData.x_data.data(), plotData.y_data.data(), plotData.point_count);
             }
