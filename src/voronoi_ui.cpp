@@ -225,15 +225,15 @@ void VoronoiUI::RenderNewDiagramScreen() {
 
             if (ImPlot::IsPlotHovered() && ImGui::IsMouseClicked(0)) {
                 ImPlotPoint mousePos = ImPlot::GetPlotMousePos();
-                if (point_count < 1000) {
-                    x_data[point_count] = mousePos.x;
-                    y_data[point_count] = mousePos.y;
-                    point_count++;
+                if (plotData.point_count < 1000) {
+                    plotData.x_data[plotData.point_count] = mousePos.x;
+                    plotData.y_data[plotData.point_count] = mousePos.y;
+                    plotData.point_count++;
                 }
             }
 
-            if (point_count > 0) {
-                ImPlot::PlotScatter("Points", x_data, y_data, point_count);
+            if (plotData.point_count > 0) {
+                ImPlot::PlotScatter("Points", plotData.x_data.data(), plotData.y_data.data(), plotData.point_count);
             }
 
             if (ImPlot::IsPlotHovered() && ImGui::IsMouseDown(2)) { // Middle mouse button

@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <string>
+#include <array>
 
 // Icon implementation
 #include "dripicon_v2.h"
@@ -27,6 +28,14 @@ private:
     ImFont* headingFont;
     ImFont* iconFont;
     ImFont* iconFont2;
+    
+    struct PlotData {
+        std::array<float, 1000> x_data; // X-axis data
+        std::array<float, 1000> y_data; // Y-axis data
+        int point_count = 0;            // Number of points
+    };
+
+    PlotData plotData;
     
     void RenderMainScreen();
     void RenderNewDiagramScreen();
