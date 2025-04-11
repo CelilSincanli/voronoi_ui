@@ -52,6 +52,7 @@ bool VoronoiUI::Initialize() {
     ImGui::StyleColorsDark();
 
     ImPlot::CreateContext(); 
+    CustomizeImPlotInputMap();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
     // Load fonts
@@ -217,7 +218,7 @@ void VoronoiUI::RenderNewDiagramScreen() {
 
         ImVec2 availableSize = ImGui::GetContentRegionAvail();
 
-        if (ImPlot::BeginPlot("Voronoi Space", availableSize)) {
+      if (ImPlot::BeginPlot("Voronoi Space", availableSize,  ImPlotFlags_NoLegend | ImPlotFlags_NoFrame | ImPlotFlags_NoMenus)){
             ImPlot::SetupAxes("X-Axis", "Y-Axis");
             ImPlot::SetupAxisLimits(ImAxis_X1, 0, 10);
             ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 5);
@@ -233,6 +234,11 @@ void VoronoiUI::RenderNewDiagramScreen() {
 
             if (point_count > 0) {
                 ImPlot::PlotScatter("Points", x_data, y_data, point_count);
+            }
+
+            if (ImPlot::IsPlotHovered() && ImGui::IsMouseDown(2)) { // Middle mouse button
+                 // Implement custom panning logic here if needed
+                 // For example, adjust axis limits based on mouse movement
             }
 
             ImPlot::EndPlot();
@@ -273,6 +279,17 @@ void VoronoiUI::RenderNewDiagramScreen() {
         }
     }
     ImGui::EndChild();
+}
+
+void VoronoiUI::CustomizeImPlotInputMap() {
+    ImPlotInputMap& inputMap = ImPlot::GetInputMap();
+
+    inputMap.Pan = ImGuiMouseButton_Middle;
+    inputMap.PanMod = 0;
+
+    inputMap.Select = ImGuiMouseButton_Right;
+    inputMap.SelectMod = 0;
+
 }
 
 void VoronoiUI::Cleanup() {

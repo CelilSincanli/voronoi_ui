@@ -30,6 +30,7 @@ private:
     
     void RenderMainScreen();
     void RenderNewDiagramScreen();
+    void CustomizeImPlotInputMap();
     enum Screen { MAIN_SCREEN, NEW_DIAGRAM_SCREEN };
     Screen currentScreen;
 
