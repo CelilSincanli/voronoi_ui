@@ -3,3 +3,25 @@
 
 # Ignore build directory
 build/
+
+# Ignore CMake-generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Ignore CMake scratch and temporary files
+CMakeFiles/CMakeScratch/
+CMakeFiles/*.cmake
+CMakeFiles/*.txt
+CMakeFiles/*.o
+CMakeFiles/*.d
+CMakeFiles/*.i
+CMakeFiles/*.s
+CMakeFiles/*.dir/
+
+# Ignore the executable
+voronoi_ui
+*.exe
+*.out
+*.bin

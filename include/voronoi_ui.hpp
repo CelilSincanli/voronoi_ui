@@ -12,11 +12,15 @@
 #include <chrono>
 #include <vector>
 #include <algorithm>
+#include <cassert>
+#include <variant>
 
 // Icon implementation
 #include "dripicon_v2.h"
 
-class VoronoiUI {
+#include "voronoi.hpp"
+
+class VoronoiUI : private GeometryUtils {
 public:
     VoronoiUI();
     ~VoronoiUI();
