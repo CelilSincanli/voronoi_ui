@@ -225,7 +225,11 @@ void VoronoiUI::RenderNewDiagramScreen() {
 
             if (ImPlot::IsPlotHovered() && ImGui::IsMouseClicked(0)) {
                 ImPlotPoint mousePos = ImPlot::GetPlotMousePos();
-                if (plotData.point_count < 1000) {
+                if (voronoi_points.size() < 1000) {
+                    std::cout << "Mouse Position: (" << mousePos.x << ", " << mousePos.y << ")\n";
+                    voronoi_points.push_back(Point_2(static_cast<double>(mousePos.x), static_cast<double>(mousePos.y)));
+                    std::cout << "Last added point: (" << voronoi_points.back().x() << ", " << voronoi_points.back().y() << ")\n";
+                
                     plotData.x_data[plotData.point_count] = mousePos.x;
                     plotData.y_data[plotData.point_count] = mousePos.y;
                     plotData.point_count++;
@@ -233,16 +237,16 @@ void VoronoiUI::RenderNewDiagramScreen() {
             }
 
             if (ImPlot::IsPlotHovered() && ImGui::IsMouseClicked(1)) { // Right mouse button
-                if (plotData.point_count > 0) {
-                    plotData.point_count--; // Decrement the point count to remove the last point
-                    plotData.x_data[plotData.point_count] = 0.0f; // Clear the last X point
-                    plotData.y_data[plotData.point_count] = 0.0f; // Clear the last Y point
+                if (voronoi_points.size() > 0) {
+                    voronoi_points.pop_back();
+                    plotData.point_count--; 
+                    plotData.x_data[plotData.point_count] = 0.0f; 
+                    plotData.y_data[plotData.point_count] = 0.0f; 
                 }
             }
-
-            if (plotData.point_count > 0) {
-                ImPlot::SetNextMarkerStyle(ImPlotMarker_Diamond, 5.0f, ImVec4(125.0f / 255.0f, 249.0f / 255.0f, 255.0f / 255.0f, 1.0f));
-                ImPlot::PlotScatter("Points", plotData.x_data.data(), plotData.y_data.data(), plotData.point_count);
+            if (voronoi_points.size() > 0) {
+                ImPlot::SetNextMarkerStyle(ImPlotMarker_Circle, 5.0f, ImVec4(255.0f / 255.0f, 125.0f / 255.0f, 125.0f / 255.0f, 1.0f));
+                ImPlot::PlotScatter("Voronoi Points", plotData.x_data.data(), plotData.y_data.data(), plotData.point_count);
             }
 
             if (ImPlot::IsPlotHovered() && ImGui::IsMouseDown(2)) { // Middle mouse button
@@ -270,18 +274,39 @@ void VoronoiUI::RenderNewDiagramScreen() {
         float buttonY = 20.0f;
         ImGui::SetCursorPos(ImVec2(buttonX, buttonY));
         if (ImGui::Button(drawButtonText, ImVec2(buttonWidth, buttonHeight))) {
-            if (plotData.point_count < 1) {
+            
+            if (voronoi_points.size() < 1) {
                 ShowNotifications("Error", "Please add at least one point to the diagram.", 3000);
             }
+            else {
+                UpdateVoronoiFaces(voronoi_points, voronoi_face_vertex_map);
+                
+                std::cout << "Voronoi Faces and their Vertices:\n";
+
+                for (const auto& [site, vertices] : voronoi_face_vertex_map) {
+                    // Print the site point of the face
+                    std::cout << "Face for Site Point (" << site.x() << ", " << site.y() << "):\n";
+
+                    // Print all vertices of the face
+                    for (const auto& vertex : vertices) {
+                        std::cout << "\tVertex: (" << vertex.x() << ", " << vertex.y() << ")\n";
+                    }
+
+                    // Add a separator for clarity
+                    std::cout << "-----------------------------------\n";
+                }
+            }
+
         }
 
         const char* saveButtonText = "Save Diagram";
         buttonY += buttonHeight + 10.0f;
         ImGui::SetCursorPos(ImVec2(buttonX, buttonY));
         if (ImGui::Button(saveButtonText, ImVec2(buttonWidth, buttonHeight))) {
-            if (plotData.point_count < 1) {
+            if (voronoi_points.size() < 1) {
                 ShowNotifications("Error", "Please add at least one point to the diagram.", 3000);
             }
+
         }
 
         const char* alignCenterText = "Align Center";
@@ -291,10 +316,9 @@ void VoronoiUI::RenderNewDiagramScreen() {
         buttonY = frameHeight3 - buttonHeight - 20.0f;
         ImGui::SetCursorPos(ImVec2(buttonX, buttonY));
         if (ImGui::Button(alignCenterText, ImVec2(buttonWidth, buttonHeight))) {
-            if (plotData.point_count < 1) {
+            if (voronoi_points.size() < 1) {
                 ShowNotifications("Error", "Please add at least one point to the diagram.", 3000);
             }
-
         }
     }
     ImGui::EndChild();
@@ -324,20 +348,20 @@ void VoronoiUI::RenderNotification() {
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 250, ImGui::GetIO().DisplaySize.y - 100), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(240, 80), ImGuiCond_Always);
 
-    for (int i = 0; i < notifications.size();)
+    for (int notification_index = 0; notification_index < notifications.size();)
     {
-        Notification& notification = notifications[i];
+        Notification& notification = notifications[notification_index];
         float elapsed_time = std::chrono::duration<float>(std::chrono::steady_clock::now() - notification.start_time).count();
 
         if(elapsed_time > notification.duration) {
-            notifications.erase(notifications.begin() + i);
+            notifications.erase(notifications.begin() + notification_index);
         }else{
             ImGui::Begin("Notification", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
             ImGui::Text("%s", notification.title.c_str());
             ImGui::Separator();
             ImGui::TextWrapped("%s", notification.text.c_str());
             ImGui::End();
-            i++;
+            notification_index++;
         }
     }
     
