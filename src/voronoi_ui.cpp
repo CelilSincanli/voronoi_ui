@@ -233,6 +233,8 @@ void VoronoiUI::RenderNewDiagramScreen() {
                     plotData.x_data[plotData.point_count] = mousePos.x;
                     plotData.y_data[plotData.point_count] = mousePos.y;
                     plotData.point_count++;
+                }else{
+                    ShowNotifications("Error", "Maximum number of points reached (1000).", 3000);
                 }
             }
 
