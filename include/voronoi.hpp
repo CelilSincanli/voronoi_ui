@@ -34,12 +34,12 @@ typedef VD::Ccb_halfedge_circulator   Ccb_halfedge_circulator;
 
 class GeometryUtils {
     private:
-        std::map<Point_2, std::vector<Point_2>> voronoi_face_vertex_map;
-        std::vector<Point_2> voronoi_points;
 
-        void UpdateVoronoiFaces(const std::vector<Point_2>& points, std::map<Point_2, std::vector<Point_2>>& face_vertex_map);
         inline void print_endpoint(Halfedge_handle e, bool is_src);
     public:
+        std::map<Point_2, std::vector<Point_2>> voronoi_face_vertex_map;
+        std::vector<Point_2> voronoi_points;
+        void UpdateVoronoiFaces(const std::vector<Point_2>& points, std::map<Point_2, std::vector<Point_2>>& face_vertex_map);
 
 };
 
